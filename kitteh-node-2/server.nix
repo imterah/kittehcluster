@@ -36,7 +36,7 @@ in {
   ]);
 
   users.users.greysoh = {
-    initialPassword\ = "1234";
+    initialPassword = "1234";
     isNormalUser = true;
     extraGroups = ["sudoer" "wheel"];
 

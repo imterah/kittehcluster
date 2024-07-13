@@ -25,7 +25,6 @@ in {
     enable = true;
     settings = {
       PasswordAuthentication = false;
-      X11Forwarding = true;
     };
   };
 
@@ -54,6 +53,21 @@ in {
     htop
     bottom
   ];
+
+  # K3s settings
+  networking.firewall = {
+    enable = true;
+    
+    allowedTCPPorts = [
+      6443
+      2379
+      2380
+    ];
+
+    allowedUDPPorts = [
+      8472
+    ];
+  };
 
   system.stateVersion = "24.05";
 }

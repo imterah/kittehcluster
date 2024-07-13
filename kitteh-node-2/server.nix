@@ -24,7 +24,6 @@ in {
     enable = true;
     settings = {
       PasswordAuthentication = false;
-      X11Forwarding = true;
     };
   };
 
@@ -53,6 +52,30 @@ in {
     htop
     bottom
   ];
+
+  networking.firewall = {
+    enable = true;
+    
+    allowedTCPPorts = [
+      # Docker swarm
+      2377
+      7946
+      4789
+
+      # K3s
+      6443
+      2379
+      2380
+    ];
+
+    allowedUDPPorts = [
+      # Docker swarm
+      7946
+
+      # K3s
+      8472
+    ];
+  };
 
   system.stateVersion = "24.05";
 }

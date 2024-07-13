@@ -1,3 +1,2 @@
-# kittehcluster
-
-Cluster setup w/ Kubernetes & Docker to host my home services
+# KittehCluster
+This is my Kubernetes clustered computing setup, based on Proxmox VE and NixOS.

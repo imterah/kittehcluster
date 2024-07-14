@@ -14,6 +14,11 @@ for FILE in kitteh-node-*/*; do
   if [ ! -f "meta/$FILE.sha" ] || ! diff -q "/tmp/kt-clusterbuild_sha512sum" "meta/$FILE.sha" > /dev/null; then
     ./build.sh $FILE_NO_EXTENSION
 
+    if [ $? -ne 0 ]; then
+      echo "Failed to build, skipping..."
+      continue
+    fi
+
     if ! grep -q "out/$FILE_NO_EXTENSION.vma.zst" meta/tagged_for_upload; then
       echo "out/$FILE_NO_EXTENSION.vma.zst" >> meta/tagged_for_upload
     fi

@@ -1,11 +1,8 @@
-# Because this behaves as cluster init, all the "commons.server.nix" seperation
-# isn't in here. However, normal commons is. Just fyi.
-
 let 
   pkgs = import <nixpkgs> {};
 in {
   imports = [
-    ../commons.nix
+    ./commons.nix
   ];
 
   proxmox.qemuConf.memory = 4096;
@@ -13,11 +10,9 @@ in {
   proxmox.qemuConf.name = "k3s-server";
   proxmox.qemuConf.diskSize = pkgs.lib.mkForce "16384";
 
-  networking.hostName = "kitteh-node-1-k3s-server";
-  
   services.k3s = {
     role = "server";
-    clusterInit = true;
+    serverAddr = "https://kitteh-node-1-k3s-server:6443";
   };
 
   # K3s settings

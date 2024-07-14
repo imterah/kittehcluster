@@ -62,14 +62,10 @@ in {
     (pkgs.lib.mkAfter  ["mdns4"]) # after dns
   ]);
 
-  users.users.greysoh = {
+  users.users.clusteradm = {
     initialPassword = "1234";
     isNormalUser = true;
     extraGroups = ["sudoer" "wheel" "docker"];
-
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDgQP14EBe0r9QnLnDy00vMhlmmo62FJnY/MqNMm0K3qQZTQSkRaBsSYHI10KcLlPEwe266opLOirLG+O0xYDi192hm+vSVfa921r1Dva0on22D5mIKg9Zx50csOTduXngnAnFnlX/W7J0zJAjcFMMTU/wCXZA50KP5a86BJzHb3lErD18cb7h8E5QhasMmEwe5kkJVB2Ys8rZqZTn8XNZ8+7Dv0RUSqMpNkVhI3U+Xcl8Q7wP8Bm6lyYkI53Wlicz2VOssfUlQA0Y2AifJDlXKK6QFDVQ9nE4qCCjiOYtkz1mIepMXxfTY1vV7RUrBHbzEIeYt8TfSuYpB/0mcnGTUHwvQBlNPwZMCxPYPxaPqYm/amb4DfhgU2m8nEAZEfC4KC/z6PBN8JPMb8NthXsSalpXsjmKjhLU4SsBvrm3y/diAS2hs6Fo2bcHg0a5qNw7nL/WFagK9fUyvQY/rAzIdbfL2ZL59Aul/nqz8dWQMdZbND1DORKzxW6lmbBqZPL8= root@zeus-proxmox"
-    ];
 
     packages = with pkgs; [
       git

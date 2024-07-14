@@ -7,9 +7,11 @@ if [ ! -d "out/" ]; then
 fi
 
 echo "Copying file to the output directory..."
+
 # Hack!
 # TODO: Fix this mess later
 mkdir -p out/$1
 rm -rf out/$1 out/$1.vma.zst
 OUT_FILE="$(sed -n '$p' build.log)"
+
 cp -r $OUT_FILE out/$1.vma.zst

@@ -13,9 +13,7 @@ in {
     }
   ];
 
-  services.k3s = {
-    enable = true;
-  };
+  services.k3s.enable = true;
 
   systemd.services.kittehclean = {
     enable = true;
@@ -78,6 +76,9 @@ in {
     bash
     htop
     bottom
+
+    # For some reason, after seperation, this package isn't included anymore, but the services are
+    k3s
   ];
 
   system.stateVersion = "24.05";

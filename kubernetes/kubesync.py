@@ -314,7 +314,7 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
     changeset_path = f"{base_changeset_path}/gen_{len(dir_contents) + 1}/"
     
     try:
-        shutil.copytree(f"{base_changeset_path}/gen_{len(dir_contents) - 1}/", changeset_path)
+        shutil.copytree(f"{base_changeset_path}/gen_{len(dir_contents)}/", changeset_path)
     except FileNotFoundError:
         os.mkdir(changeset_path)
         os.mkdir(f"{changeset_path}/k3hashes")
@@ -350,12 +350,12 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
                         Path(f"{changeset_path}/helmhashes/{meta_id}").touch()
 
                         changeset_values[project.name] = [
-                            f"helm repo update {project.helm_settings.repo}",
+                            f"helm repo update {project.helm_settings.repo[:project.helm_settings.repo.index("/")]}",
                             f"helm upgrade --install {project.helm_settings.name} {project.helm_settings.repo} {"--create-namespace" if project.helm_settings.create_namespace else ""} --namespace {project.helm_settings.namespace_name}"
                         ]
                     elif project.helm_settings.mode == "upgrade" or mode == "update":
                         changeset_values[project.name] = [
-                            f"helm repo update {project.helm_settings.repo}",
+                            f"helm repo update {project.helm_settings.repo[:project.helm_settings.repo.index("/")]}",
                             f"helm upgrade {project.helm_settings.name} {project.helm_settings.repo} {"--create-namespace" if project.helm_settings.create_namespace else ""} --namespace {project.helm_settings.namespace_name}"
                         ]
             case "k3s":
@@ -378,10 +378,13 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
                         data = kube_file.read()
                         file_hash = hashlib.md5(data).hexdigest()
                     
-                    with open(f"{changeset_path}/k3hashes/{meta_id}", "rw") as kube_metaid_file:
-                        if kube_metaid_file.read() == file_hash:
+                    with open(f"{changeset_path}/k3hashes/{meta_id}", "r+") as kube_metaid_file:
+                        read_hash = kube_metaid_file.read()
+                        
+                        if read_hash == file_hash:
                             continue
                         else:
+                            kube_metaid_file.seek(0)
                             kube_metaid_file.write(file_hash)
                     
                 changeset_values[project.name] = [
@@ -424,6 +427,10 @@ if not projects:
 
 print("Generating changesets...")
 change_set = generate_change_set(projects)
+
+if not change_set:
+    print("No changes detected.")
+    exit(0)
 
 if args.dryrun_only:
     sigint_handler(None, None)

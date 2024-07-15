@@ -11,6 +11,8 @@ let
   pkgs = import <nixpkgs> {};
 in {
   services.k3s.token = "shared.secret.here";
-  
-  
+
+  users.users.clusteradm.openssh.authorizedKeys.keys = [
+
+  ];
 }

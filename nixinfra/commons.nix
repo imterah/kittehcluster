@@ -13,8 +13,6 @@ in {
     }
   ];
 
-  services.k3s.enable = true;
-
   systemd.services.kittehclean = {
     enable = true;
     description = "Cleans up this Kitteh node & runs init tasks";

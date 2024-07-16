@@ -18,8 +18,10 @@ in {
   networking.hostName = "kitteh-node-1-k3s-server";
   
   services.k3s = {
+    enable = true;
     role = "server";
     clusterInit = true;
+    extraFlags = "--disable servicelb";
   };
 
   # K3s settings

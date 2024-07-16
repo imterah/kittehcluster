@@ -16,7 +16,6 @@ in {
     enable = true;
     role = "agent";
     serverAddr = "https://kitteh-node-1-k3s-server:6443";
-    extraFlags = "--disable servicelb";
   };
 
   virtualisation.docker.enable = true;

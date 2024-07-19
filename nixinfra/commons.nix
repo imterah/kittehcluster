@@ -40,6 +40,8 @@ in {
     wantedBy = ["network-online.target"];
   };
 
+  
+
   networking.networkmanager.enable = true;
 
   services.openssh = {

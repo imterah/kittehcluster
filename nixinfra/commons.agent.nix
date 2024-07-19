@@ -10,28 +10,44 @@ in {
     enable = true;
     description = "KittehCluster's modified k3s service";
 
+    # From L324: https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/cluster/k3s/builder.nix
+    path = with pkgs; [
+      kmod
+      socat
+      iptables
+      iproute2
+      ipset
+      bridge-utils
+      ethtool
+      util-linux
+      conntrack-tools
+      runc
+      bash
+    ];
+
     serviceConfig = {
       Type = "simple";
       ExecStart = pkgs.writeShellScript "k3s-hack" ''
         if [ ! -d "/tmp/k3shack" ]; then
           # Manually recreate the symlinks. Don't @ me.
           mkdir /tmp/k3shack
-          
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/containerd
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/crictl
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/ctr
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/k3s-agent
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/k3s-certificate
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/k3s-completion
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/k3s-etcd-snapshot
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/k3s-secrets-encrypt
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/k3s-server
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/k3s-token
-          ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/kubectl
+
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/containerd
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/crictl
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/ctr
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-agent
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-certificate
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-completion
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-etcd-snapshot
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-secrets-encrypt
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-server
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-token
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/kubectl
+          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s
         fi
 
         export PATH=$PATH:/tmp/k3shack
-        ${pkgs.k3s}/bin/k3s agent --token ${k3s_token} --server https://kitteh-node-1-k3s-server:6443
+        k3s agent --token ${k3s_token} --server https://kitteh-node-1-k3s-server:6443
       '';
     };
   };

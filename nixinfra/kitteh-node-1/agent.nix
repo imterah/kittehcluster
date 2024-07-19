@@ -6,4 +6,5 @@ in {
   ];
 
   networking.hostName = "kitteh-node-1-k3s-agent";
+  environment.variables.NIX_BUILD_ID = "kitteh-node-1/agent";
 }

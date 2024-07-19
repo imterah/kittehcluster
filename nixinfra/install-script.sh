@@ -45,7 +45,29 @@ if [ ! -f "/mnt/etc/nixos/install-script.sh" ]; then
 fi
 
 sudo mv /tmp/hardware-configuration.nix /mnt/etc/nixos/nixinfra/
-sudo nixos-install -I /mnt/etc/nixos/nixinfra/$NIX_INSTALL_PATH
+sudo mv $SECRETS_PATH /mnt/etc/nixos/nixinfra/secrets.nix
 
-sudo umount /mnt/boot
-sudo umount /mnt
+sudo bash -c "NIXOS_CONFIG=/mnt/etc/nixos/nixinfra/$NIX_INSTALL_PATH nixos-install"
+RET=$?
+
+if [ $RET -ne 0 ]; then
+  echo "Failed to install! Attempting to spawn bash for debugging..."
+  echo "NOTE: You will not see a bash prompt (for some reason)"
+  bash
+  echo "Bash exited."
+else
+  echo "Successfully installed! Finishing install..."
+  mkdir /mnt/home/clusteradm/.bin
+  echo "NIX_INSTALL_PATH=/etc/nixos/nixinfra/$NIX_INSTALL_PATH" > /mnt/home/clusteradm/.bin/.env
+  echo 'export PATH="$PATH:/home/clusteradm/.bin"' >> /mnt/home/clusteradm/.bashrc
+  echo 'export PATH="$PATH:/home/clusteradm/.bin"' >> /mnt/home/clusteradm/.zshrc
+  sleep 60
+  echo "Rebooting"
+  sudo reboot
+  exit
+fi
+
+echo "Unmounting filesystems..."
+sudo umount -f /mnt/boot
+sudo umount -f /mnt
+echo "Done."

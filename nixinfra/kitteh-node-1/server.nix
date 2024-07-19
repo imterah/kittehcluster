@@ -9,6 +9,7 @@ in {
   ];
 
   networking.hostName = "kitteh-node-1-k3s-server";
+  environment.variables.NIX_BUILD_ID = "kitteh-node-1/server";
   
   services.k3s = {
     enable = true;

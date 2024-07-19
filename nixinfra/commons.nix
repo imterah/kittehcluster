@@ -1,6 +1,6 @@
 let 
   pkgs = import <nixpkgs> {};
-  secret_data = builtins.readFile ./secrets.nix;
+  update_script = builtins.readFile ./update.sh;
 in {
   imports = [
     ./secrets.nix
@@ -29,14 +29,10 @@ in {
         chmod -R 644 /etc/rancher 2> /dev/null > /dev/null
         chmod -R 644 /var/lib/rancher 2> /dev/null > /dev/null
 
-        if [ ! -d "/etc/nixos/git" ]; then
-          echo "Waiting for true internet bringup..."
-          sleep 10
-          echo "Downloading configuration files..."
-          ${pkgs.git}/bin/git clone https://git.hofers.cloud/greysoh/kittehcluster /etc/nixos/
-          cp -r ${pkgs.writeText "secrets.nix" secret_data} /etc/nixos/nixinfra/secrets.nix
-        fi
-
+        # Because I'm lazy (and this works), we use this method to write the file
+        rm -rf /home/clusteradm/update
+        ln -s ${pkgs.writeShellScript "update" update_script} /home/clusteradm/update
+        
         echo "Done."
       '';
     };

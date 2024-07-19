@@ -73,6 +73,9 @@ in {
 
     # Updating
     git
+
+    # K3s command line tools
+    k3s
   ];
 
   system.stateVersion = "24.05";

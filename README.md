@@ -14,7 +14,7 @@ Currently, I cannot recommend that you use this setup in production yet. I have 
 3. Change `services.k3s.token` to be a unique token (i.e using `uuidgen`, `head -c 500 /dev/random | sha1sum | cut -d " " -f 1`, etc)
 4. Change `users.users.clusteradm.openssh.authorizedKeys.keys` to have your SSH key(s) in there.
 5. (Proxmox-specific, but you'll need to do a similar process on i.e ESXi, XenServer, etc.) Go to [the NixOS download page](https://nixos.org/download/), and copy the minimal ISO download. Go your ISO image volume (by default, this is `local`), click on ISO images, click download from URL, paste in the URL, click query URL, then download the file on all of your nodes.
-6. Create VM(s) that use VirtIO hard drives (i.e drives with `/dev/vda`), and the ISO set to the NixOS installer.
+6. Create VM(s) that use VirtIO hard drives (i.e drives with `/dev/vdX`), and the ISO set to the NixOS installer.
 7. Boot the installer, and set the password of the `nixos` user to something so you can SSH in to start the installer.
 8. With the environment variable `NIX_INSTALL_PATH` set to the nix file you want to use for installation (i.e `kitteh-node-1/agent.nix`), run `./install.sh IP_ADDRESS_FOR_VM_HERE`. This will take about 20 minutes on my setup. You are highly encouraged to run multiple installations in parallel.
 9. When the installation is done (it will autoreboot), you can now connect using your SSH key to any of the nodes with the user `clusteradm`. The default password is `1234`. Be sure to change this!

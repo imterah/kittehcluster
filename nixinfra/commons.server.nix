@@ -5,11 +5,20 @@ in {
     ./commons.nix
   ];
 
-  services.k3s = {
+  systemd.services.k3s = {
     enable = true;
-    role = "server";
-    serverAddr = "https://kitteh-node-1-k3s-server:6443";
-    extraFlags = "--disable servicelb";
+    description = "(manual) k3s service";
+
+    path = [
+      pkgs.k3s
+    ];
+
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = pkgs.writeShellScript "k3s-hack" ''
+        k3s server --token ${services.k3s.token} --server https://kitteh-node-1-k3s-server:6443 --disable servicelb
+      '';
+    };
   };
 
   # K3s settings

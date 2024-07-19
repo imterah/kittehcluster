@@ -5,10 +5,20 @@ in {
     ./commons.nix
   ];
 
-  services.k3s = {
+  systemd.services.k3s = {
     enable = true;
-    role = "agent";
-    serverAddr = "https://kitteh-node-1-k3s-server:6443";
+    description = "(manual) k3s service";
+
+    path = [
+      pkgs.k3s
+    ];
+
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = pkgs.writeShellScript "k3s-hack" ''
+        k3s agent --token ${services.k3s.token} --server https://kitteh-node-1-k3s-server:6443
+      '';
+    };
   };
 
   virtualisation.docker.enable = true;

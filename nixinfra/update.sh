@@ -1,8 +1,7 @@
 nix_bld_unset_err() {
-  echo "ERROR: You have held a (potentially) broken install!"
-  echo "NIX_BUILD_ID is not set (should be set by default!)"
-  echo "Please set NIX_BUILD_ID manually. i.e:"
-  echo "NIX_BUILD_ID=kitteh-node-1/agent updater"
+  echo "ERROR: NIX_BUILD_ID is not set (should be set by default!)"
+  echo "  Please set NIX_BUILD_ID manually. i.e:"
+  echo "  NIX_BUILD_ID=kitteh-node-1/agent updater"
   exit 1
 }
 
@@ -24,6 +23,7 @@ if [[ "$UID" != "0" ]]; then
   # but this works:
   # - $: sudo su
   # - #: ./update
+  # NOTE: Calling `$: sudo ./update` still doesn't work with this hack. Just use `./update`, man.
 
   echo "NIX_BUILD_ID=$NIX_BUILD_ID" > /tmp/nixbuildid
   chmod +x /tmp/nixbuildid

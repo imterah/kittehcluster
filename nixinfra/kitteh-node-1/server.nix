@@ -10,12 +10,21 @@ in {
 
   networking.hostName = "kitteh-node-1-k3s-server";
   environment.variables.NIX_BUILD_ID = "kitteh-node-1/server";
-  
-  services.k3s = {
+
+  systemd.services.k3s = {
     enable = true;
-    role = "server";
-    clusterInit = true;
-    extraFlags = "--disable servicelb";
+    description = "(manual) k3s service";
+
+    path = [
+      pkgs.k3s
+    ];
+
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = pkgs.writeShellScript "k3s-hack" ''
+        k3s server --cluster-init --token ${services.k3s.token} --disable servicelb
+      '';
+    };
   };
 
   # K3s settings

@@ -2,3 +2,4 @@ out
 build.log
 secrets.nix
 meta
+hardware-configuration.nix

@@ -5,13 +5,6 @@ in {
     ./commons.nix
   ];
 
-  # This is intentionally defined like this (not using braces) for updating. DO NOT CHANGE THIS.
-  # - greysoh
-  proxmox.qemuConf.memory = 8192;
-  proxmox.qemuConf.cores = 4;
-  proxmox.qemuConf.name = "k3s-agent";
-  proxmox.qemuConf.diskSize = pkgs.lib.mkForce "131072";
-
   services.k3s = {
     enable = true;
     role = "agent";

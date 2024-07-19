@@ -4,6 +4,7 @@ let
 in {
   imports = [
     ./secrets.nix
+    ./hardware-configuration.nix
   ];
 
   swapDevices = [
@@ -12,6 +13,9 @@ in {
       size = 4 * 1024;
     }
   ];
+
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/vda";
 
   systemd.services.kittehclean = {
     enable = true;

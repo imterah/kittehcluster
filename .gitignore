@@ -5,6 +5,10 @@ __pycache__
 .server-setup
 .env
 out
+<<<<<<< HEAD
 
 # kubernetes/
-meta
+build.log
+secrets.nix
+kubernetes/meta
+kubernetes/secrets

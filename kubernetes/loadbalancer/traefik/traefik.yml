@@ -1,0 +1,53 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: traefik-deployment
+  labels:
+    app: traefik
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-account
+      containers:
+        - name: traefik
+          image: traefik:v3.1
+          args:
+            - --api.insecure
+            - --providers.kubernetesingress
+            - --certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare
+            - --certificatesresolvers.cloudflare.acme.email=greysonhofer09@gmail.com
+            - --certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1
+            - --certificatesresolvers.cloudflare.acme.storage=/ssl-certs/acme-cloudflare.json
+          ports:
+            - name: web
+              containerPort: 80
+            - name: web
+              containerPort: 443
+            - name: dashboard
+              containerPort: 8080
+          env:
+            - name: CF_API_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: traefik-cf-creds
+                  key: cf-email
+            - name: CF_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: traefik-cf-creds
+                  key: cf-key
+          volumeMounts:
+            - mountPath: /ssl-certs/
+              name: cert-data
+      volumes:
+        - name: cert-data
+          persistentVolumeClaim:
+            claimName: traefik-volume-claim

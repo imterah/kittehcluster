@@ -339,24 +339,27 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
                             f"helm repo add {project.helm_settings.name} {project.helm_settings.repo}"
                         ]
                 elif project.helm_settings.mode == "upgrade" or project.helm_settings.mode == "install":
-                    if project.helm_settings.name == None or project.helm_settings.repo == None or project.helm_settings.namespace_name == None:
-                        print("ERROR: 'upgrade' or 'install' is set but either: name, repo, or namespace_name is undefined")
+                    if project.helm_settings.name == None or project.helm_settings.repo == None:
+                        print("ERROR: 'upgrade' or 'install' is set but either: name, or repo, is undefined")
                         exit(1)
                     
                     data_in_bytes = bytearray(f"install.{project.helm_settings.repo}_{project.helm_settings.name}", "utf-8")
                     meta_id = hashlib.md5(data_in_bytes).hexdigest()
+
+                    create_namespace = "--create-namespace" if project.helm_settings.create_namespace else ""
+                    namespace = f"--namespace {project.helm_settings.namespace_name}" if project.helm_settings.namespace_name else ""
 
                     if not os.path.isfile(f"{changeset_path}/helmhashes/{meta_id}") and project.helm_settings.mode == "install":
                         Path(f"{changeset_path}/helmhashes/{meta_id}").touch()
 
                         changeset_values[project.name] = [
                             f"helm repo update {project.helm_settings.repo[:project.helm_settings.repo.index("/")]}",
-                            f"helm upgrade --install {project.helm_settings.name} {project.helm_settings.repo} {"--create-namespace" if project.helm_settings.create_namespace else ""} --namespace {project.helm_settings.namespace_name}"
+                            f"helm upgrade --install {project.helm_settings.name} {project.helm_settings.repo} {create_namespace} {namespace}"
                         ]
                     elif project.helm_settings.mode == "upgrade" or mode == "update":
                         changeset_values[project.name] = [
                             f"helm repo update {project.helm_settings.repo[:project.helm_settings.repo.index("/")]}",
-                            f"helm upgrade {project.helm_settings.name} {project.helm_settings.repo} {"--create-namespace" if project.helm_settings.create_namespace else ""} --namespace {project.helm_settings.namespace_name}"
+                            f"helm upgrade {project.helm_settings.name} {project.helm_settings.repo} {create_namespace} {namespace}"
                         ]
             case "k3s":
                 data_in_bytes = bytearray(f"{project.kube_settings.yml_path}", "utf-8")

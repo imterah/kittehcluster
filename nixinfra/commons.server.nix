@@ -1,5 +1,6 @@
 let 
   pkgs = import <nixpkgs> {};
+  k3s_token = (import ./secrets.nix).services.k3s.token;
 in {
   imports = [
     ./commons.nix
@@ -16,7 +17,7 @@ in {
     serviceConfig = {
       Type = "simple";
       ExecStart = pkgs.writeShellScript "k3s-hack" ''
-        k3s server --token ${services.k3s.token} --server https://kitteh-node-1-k3s-server:6443 --disable servicelb
+        k3s server --token ${k3s_token} --server https://kitteh-node-1-k3s-server:6443 --disable servicelb
       '';
     };
   };

@@ -21,6 +21,8 @@ in {
       ExecStart = pkgs.writeShellScript "k3s-hack" ''
         if [ ! -d "/tmp/k3shack" ]; then
           # Manually recreate the symlinks. Don't @ me.
+          mkdir /tmp/k3shack
+
           ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/containerd
           ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/crictl
           ln -s ${pkgs.k3s}/bin/k3s /tmp/k3shack/ctr

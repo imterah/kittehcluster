@@ -46,7 +46,7 @@ in {
           ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s
         fi
 
-        export PATH=$PATH:/tmp/k3shack
+        export PATH=/tmp/k3shack:$PATH
         k3s agent --token ${k3s_token} --server https://kitteh-node-1-k3s-server:6443
       '';
     };

@@ -34,23 +34,23 @@ in {
     serviceConfig = {
       Type = "simple";
       ExecStart = pkgs.writeShellScript "k3s-hack" ''
-        if [ ! -d "/tmp/k3shack" ]; then
-          # Manually recreate the symlinks. Don't @ me.
-          mkdir /tmp/k3shack
+        rm -rf /tmp/k3shack
 
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/containerd
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/crictl
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/ctr
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-agent
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-certificate
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-completion
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-etcd-snapshot
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-secrets-encrypt
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-server
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-token
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/kubectl
-          ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s
-        fi
+        # Manually recreate the symlinks. Don't @ me.
+        mkdir /tmp/k3shack
+
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/containerd
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/crictl
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/ctr
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-agent
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-certificate
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-completion
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-etcd-snapshot
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-secrets-encrypt
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-server
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s-token
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/kubectl
+        ln -s ${pkgs.k3s}/bin/.k3s-wrapped /tmp/k3shack/k3s
 
         export PATH=/tmp/k3shack:$PATH
         k3s server --cluster-init --token ${k3s_token} --disable servicelb

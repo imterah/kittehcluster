@@ -20,9 +20,10 @@ fi
 
 if [[ "$UID" != "0" ]]; then
   # Hacky workaround for failing to read NIX_BUILD_ID when called like:
-  # ./update
+  # - $: ./update
   # but this works:
-  # sudo ./update
+  # - $: sudo su
+  # - #: ./update
 
   echo "NIX_BUILD_ID=$NIX_BUILD_ID" > /tmp/nixbuildid
   chmod +x /tmp/nixbuildid

@@ -62,10 +62,6 @@ in {
     initialPassword = "1234";
     isNormalUser = true;
     extraGroups = ["sudoer" "wheel" "docker"];
-
-    packages = with pkgs; [
-      git
-    ];
   };
 
   environment.systemPackages = with pkgs; [
@@ -75,8 +71,8 @@ in {
     htop
     bottom
 
-    # For some reason, after seperation, this package isn't included anymore, but the services are
-    k3s
+    # Updating
+    git
   ];
 
   system.stateVersion = "24.05";

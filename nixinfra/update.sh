@@ -12,5 +12,9 @@ if [[ "$UID" != "0" ]]; then
   exit $?
 fi
 
+pushd /etc/nixos 2> /dev/null > /dev/null
+git pull
+popd 2> /dev/null > /dev/null
+
 export NIX_PATH="$(printf $NIX_PATH | sed --expression="s#/etc/nixos/configuration.nix#/etc/nixos/nixinfra/$NIX_BUILD_ID.nix#g")"
 nixos-rebuild switch --upgrade

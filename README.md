@@ -16,7 +16,7 @@ Currently, I cannot recommend that you use this setup in production yet. I have 
 5. (Proxmox-specific, but you'll need to do a similar process on i.e ESXi, XenServer, etc.) Go to [the NixOS download page](https://nixos.org/download/), and copy the minimal ISO download. Go your ISO image volume (by default, this is `local`), click on ISO images, click download from URL, paste in the URL, click query URL, then download the file on all of your nodes.
 6. Create VM(s) that use VirtIO hard drives (i.e drives with `/dev/vda`), and the ISO set to the NixOS installer.
 7. Boot the installer, and set the password of the `nixos` user to something so you can SSH in to start the installer.
-8. With the environment variable `NIX_INSTALL_PATH` set to the nix file you want to use for installation (i.e `kitteh-node-1/agent.nix`), run `./install.sh`. This will take about 20 minutes on my setup. You are highly encouraged to run multiple installations in parallel.
+8. With the environment variable `NIX_INSTALL_PATH` set to the nix file you want to use for installation (i.e `kitteh-node-1/agent.nix`), run `./install.sh IP_ADDRESS_FOR_VM_HERE`. This will take about 20 minutes on my setup. You are highly encouraged to run multiple installations in parallel.
 ### Kubernetes setup
 1. SSH into any of the nodes. (i.e `ssh clusteradm@kitteh-node-2-k3s-server`)
 2. As root, grab `/etc/rancher/k3s/k3s.yaml`, and copy it to wherever you store your k3s configurations (on macOS, this is `~/.kube/config`)

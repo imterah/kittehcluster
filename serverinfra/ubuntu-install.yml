@@ -31,6 +31,9 @@ autoinstall:
     install: false
   drivers:
     install: false
+  reporting:
+    hook:
+      type: webhook
   kernel:
     package: linux-generic
   keyboard:

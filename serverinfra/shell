@@ -14,8 +14,9 @@ if [ ! -f "conifg/.env" ]; then
 fi
 
 echo "Installation usage:"
-echo " - ./install.sh \$IP:"
-echo "   Installs Ubuntu Server on \$IP. You will find the correct password in Help > Help on SSH access"
+echo " - ./install.sh \$CONFIG \$OPTIONAL_IP:"
+echo "   Installs Ubuntu Server using configuration \$CONFIG."
+echo "   \$OPTIONAL_IP is the optional IP address of your computer, if it guesses your IP address wrong."
 echo
 echo "Have fun!"
 

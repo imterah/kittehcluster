@@ -11,11 +11,12 @@ for item in ["K3S_TOKEN", "SETUP_USERNAME", "SETUP_PASSWORD"]:
         print(f"ERROR: .env failed to load! (missing environment variable '{item}')")
         exit(1)
 
-if len(argv) < 2:
-    print("ERROR: Missing the server name")
+if len(argv) < 3:
+    print("ERROR: Missing the server name or the webhook URL")
     exit(1)
 
 server_name = argv[1]
+server_webhook_url = argv[2]
 
 server_infra_contents = ""
 
@@ -92,6 +93,8 @@ for file in ssh_directory_contents:
 yaml_install_script["autoinstall"]["identity"]["hostname"] = infra_server["hostname"]
 yaml_install_script["autoinstall"]["identity"]["username"] = environ["SETUP_USERNAME"]
 yaml_install_script["autoinstall"]["identity"]["password"] = environ["SETUP_PASSWORD"]
+
+yaml_install_script["autoinstall"]["reporting"]["hook"]["endpoint"] = server_webhook_url
 
 ubuntu_install_contents = yaml.dump(yaml_install_script, Dumper=yaml.CDumper)
 

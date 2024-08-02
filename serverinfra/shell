@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+if [ ! -f "config/.env" ]; then
+  echo "# NOTE: The UUID should be automatically generated, when running nix-shell. However, if it isn't, then" > .env
+  echo "# run uuidgen and change the below value." >> .env
+  cat config/.env.example >> config/.env
+
+  # Apple moment
+  sed "s/K3S_TOKEN=\"shared.secret.here\"/K3S_TOKEN=\"$(uuidgen)\"/g" config/.env > config/.env.2
+  mv config/.env.2 config/.env
+
+  echo "INFO: Before running any installation scripts, you should look over the contents of the file '.env',"
+  echo "and modify the contents as needed."
+  echo
+fi
+
+echo "Installation usage:"
+echo " - ./install.sh \$CONFIG \$OPTIONAL_IP:"
+echo "   Installs Ubuntu Server using configuration \$CONFIG."
+echo "   \$OPTIONAL_IP is the optional IP address of your computer, if it guesses your IP address wrong."
+echo
+echo "Have fun!"
+
+set -a
+source config/.env
+set +a
+
+bash
+EXIT_CODE=$?
+
+exit $EXIT_CODE

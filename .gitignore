@@ -1,5 +1,10 @@
+# Python ignore
+__pycache__
+
+# serverinfra/
+.server-setup
+.env
 out
-build.log
-secrets.nix
+
+# kubernetes/
 meta
-hardware-configuration.nix

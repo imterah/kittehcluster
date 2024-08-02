@@ -21,10 +21,10 @@ Currently, I *really* cannot recommend that you use this setup in production yet
 1. SSH into any of the nodes. (i.e `ssh clusteradm@kitteh-node-2-k3s-server`)
 2. As root, grab `/etc/rancher/k3s/k3s.yaml`, and copy it to wherever you store your k3s configurations (on macOS, this is `~/.kube/config`)
 ## Updating
-Run `apt update` and `apt upgrade -y` for the base system.
+Run `apt update` and `apt upgrade -y` for the base system. TODO for Kubernetes.
 ## Customization
 ### Adding nodes
-Copy `kitteh-node-2`, to `kitteh-node-X`, where `X` is the server number. Change the hostname to correspond to each clustered computer (i.e 3rd computer's k3s agent is `kitteh-node-3-k3s-agent`)
+In `serverinfra/infrastructure.ini`, copy the role(s) from kitteh-node-2 to a new node (ex. `kitteh-node-2/server` -> `kitteh-node-3/server`, etc), and run the install script again.
 ### Custom cluster setup / Forking
 This is a guide. You can change more stuff if you'd like, but this will get you started.  
   

@@ -44,7 +44,7 @@ autoinstall:
   oem:
     install: auto
   source:
-    id: ubuntu-server-minimal
+    id: ubuntu-server
     search_drivers: false
   identity:
     realname: Cluster Administrator

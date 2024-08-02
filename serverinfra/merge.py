@@ -61,8 +61,13 @@ if "upstream" in infra_server:
         print(f"ERROR: Missing hostname in upstream '{upstream_name}'")
         exit(1)
 
+    upstream_hostname = upstream_server["hostname"]
+
+    if "alt_hostname_definition" in upstream_server:
+        upstream_hostname = upstream_server["alt_hostname_definition"]
+
     custom_shell_script += f"export UPSTREAM_NAME=\"{upstream_name}\"\n"
-    custom_shell_script += f"export UPSTREAM_HOSTNAME=\"{upstream_server["hostname"]}\"\n"
+    custom_shell_script += f"export UPSTREAM_HOSTNAME=\"{upstream_hostname}\"\n"
 
 custom_shell_script += "\n"
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-if [ ! -f "conifg/.env" ]; then
+if [ ! -f "config/.env" ]; then
   echo "# NOTE: The UUID should be automatically generated, when running nix-shell. However, if it isn't, then" > .env
   echo "# run uuidgen and change the below value." >> .env
   cat config/.env.example >> config/.env

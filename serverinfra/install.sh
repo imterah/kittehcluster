@@ -31,9 +31,8 @@ if [ "$EXTERN_IP" == "" ]; then
   fi
 fi
 
-./merge.py "$SERVER_INSTALL_PATH" "http://$EXTERN_IP:$HTTP_PORT/api/installer_update_webhook"
-
 echo "[x] initializing..."
+./merge.py "$SERVER_INSTALL_PATH" "http://$EXTERN_IP:$HTTP_PORT/api/installer_update_webhook"
 mkdir $TMPDIR
 
 echo "#cloud-config" > $TMPDIR/user-data

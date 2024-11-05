@@ -41,7 +41,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - targetPort: web
+    - targetPort: web-tls
       port: 443
   selector:
     app: traefik

@@ -4,9 +4,9 @@ metadata:
   name: first-pool
 spec:
   addresses:
-  - 192.168.2.10-192.168.2.254
+    - 192.168.2.10-192.168.2.254
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: example
+  name: first-pool-advertisement

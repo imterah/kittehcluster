@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mariadb-details
-  labels:
-    app: mariadb
-data:
-  MARIADB_DATABASE: mdb_db

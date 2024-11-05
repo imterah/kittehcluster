@@ -62,6 +62,8 @@ class HelmSettings:
     repo: Optional[str]
     namespace_name: Optional[str]
     create_namespace: bool
+    options_file: Optional[str]
+    set_vars: Optional[str]
 
 @dataclass
 class KubeSettings:
@@ -157,7 +159,9 @@ def parse_project(contents: str, workdir=os.getcwd()) -> list[Project]:
                     found_project["name"],
                     found_project["repo"] if "repo" in found_project else None,
                     found_project["namespace"] if "namespace" in found_project else None,
-                    create_namespace
+                    create_namespace,
+                    os.path.join(workdir, found_project["options_file"]) if "options_file" in found_project else None,
+                    os.path.join(workdir, found_project["variable_file"]) if "variable_file" in found_project else None,
                 )
 
                 project_obj = Project(
@@ -266,7 +270,7 @@ def sort_projects(projects: list[Project]) -> list[Project]:
     while project_list_staging:
         n = project_list_staging.pop(0)
         sorted_projects.append(n)
-        
+
         nodes_with_edges = list(filter(lambda x: n.name in x.depends_on, projects))
 
         for m in nodes_with_edges:
@@ -277,8 +281,9 @@ def sort_projects(projects: list[Project]) -> list[Project]:
 
     # Check for circular dependencies/cycles
     if any(project.depends_on for project in projects):
+        print(list(filter(lambda project: len(project.depends_on) != 0, projects)))
         raise ValueError("Found circular dependency")
-    
+
     return sorted_projects
 
 def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
@@ -298,13 +303,14 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
     changeset_meta_id = ""
 
     for line in k3s_config_str.splitlines():
-        if line.strip().startswith("certificate-authority-data"):
-            data = line.strip()[line.strip().index(" ") + 1:]
+        stripped_line = line.strip()
+        if stripped_line.startswith("certificate-authority-data"):
+            data = stripped_line[stripped_line.index(" ") + 1:]
             data_in_bytes = bytearray(changeset_meta_id + data, "utf-8")
             changeset_meta_id = hashlib.md5(data_in_bytes).hexdigest()
-    
+
     base_changeset_path = f"meta/{changeset_meta_id}"
-    
+
     try:
         os.mkdir(base_changeset_path)
     except FileExistsError:
@@ -312,7 +318,7 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
 
     dir_contents = os.listdir(base_changeset_path)
     changeset_path = f"{base_changeset_path}/gen_{len(dir_contents) + 1}/"
-    
+
     try:
         shutil.copytree(f"{base_changeset_path}/gen_{len(dir_contents)}/", changeset_path)
     except FileNotFoundError:
@@ -320,21 +326,24 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
         os.mkdir(f"{changeset_path}/k3hashes")
         os.mkdir(f"{changeset_path}/helmhashes")
         os.mkdir(f"{changeset_path}/shellhashes")
-    
+
     for project in sorted_projects:
         match project.mode:
             case "helm":
+                if project.helm_settings == None:
+                    continue
+
                 if project.helm_settings.mode == "add_repo":
                     if project.helm_settings.repo == None or project.helm_settings.name == None:
                         print("ERROR: 'add_repo' is set but either repo or name is undefined")
                         exit(1)
-                    
+
                     data_in_bytes = bytearray(f"add_repo.{project.helm_settings.repo}_{project.helm_settings.name}", "utf-8")
                     meta_id = hashlib.md5(data_in_bytes).hexdigest()
 
                     if not os.path.isfile(f"{changeset_path}/helmhashes/{meta_id}"):
                         Path(f"{changeset_path}/helmhashes/{meta_id}").touch()
-                        
+
                         changeset_values[project.name] = [
                             f"helm repo add {project.helm_settings.name} {project.helm_settings.repo}"
                         ]
@@ -342,26 +351,81 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
                     if project.helm_settings.name == None or project.helm_settings.repo == None:
                         print("ERROR: 'upgrade' or 'install' is set but either: name, or repo, is undefined")
                         exit(1)
-                    
+
                     data_in_bytes = bytearray(f"install.{project.helm_settings.repo}_{project.helm_settings.name}", "utf-8")
                     meta_id = hashlib.md5(data_in_bytes).hexdigest()
 
                     create_namespace = "--create-namespace" if project.helm_settings.create_namespace else ""
                     namespace = f"--namespace {project.helm_settings.namespace_name}" if project.helm_settings.namespace_name else ""
 
-                    if not os.path.isfile(f"{changeset_path}/helmhashes/{meta_id}") and project.helm_settings.mode == "install":
+                    options_file = f"-f {project.helm_settings.options_file}" if project.helm_settings.options_file else ""
+                    should_still_continue = False
+
+                    variables = ""
+
+                    if project.helm_settings.set_vars:
+                        with open(project.helm_settings.set_vars, "r") as variable_file:
+                            contents = variable_file.read().splitlines()
+                            contents = list(map(lambda x: x.strip(), contents))
+                            contents = list(filter(lambda x: not x.startswith("#") and x != "", contents))
+
+                            for content in contents:
+                                key = content[0:content.index("=")]
+                                value = content[content.index("=")+1:]
+
+                                variables += f"--set \"{key}\"=\"{value}\" "
+
+                            variables = variables[:len(variables)-1]
+
+                    if project.helm_settings.options_file:
+                        data_in_bytes = bytearray(f"{project.helm_settings.options_file}", "utf-8")
+                        options_file_meta_id = hashlib.md5(data_in_bytes).digest().hex()
+
+                        if not os.path.isfile(f"{changeset_path}/helmhashes/{options_file_meta_id}"):
+                            file_hash = ""
+
+                            with open(project.helm_settings.options_file, "rb") as helm_options_file:
+                                data = helm_options_file.read()
+                                file_hash = hashlib.md5(data).hexdigest()
+
+                            with open(f"{changeset_path}/helmhashes/{options_file_meta_id}", "w") as helm_options_metaid_file:
+                                helm_options_metaid_file.write(file_hash)
+
+                            should_still_continue = True
+                        else:
+                            file_hash = ""
+
+                            with open(project.helm_settings.options_file, "rb") as helm_options_file:
+                                data = helm_options_file.read()
+                                file_hash = hashlib.md5(data).hexdigest()
+
+                            with open(f"{changeset_path}/helmhashes/{options_file_meta_id}", "r+") as helm_options_metaid_file:
+                                read_hash = helm_options_metaid_file.read()
+
+                                if read_hash != file_hash:
+                                    helm_options_metaid_file.seek(0)
+                                    helm_options_metaid_file.write(file_hash)
+
+                                    should_still_continue = True
+
+                    if (not os.path.isfile(f"{changeset_path}/helmhashes/{meta_id}") or should_still_continue) and project.helm_settings.mode == "install":
                         Path(f"{changeset_path}/helmhashes/{meta_id}").touch()
 
                         changeset_values[project.name] = [
                             f"helm repo update {project.helm_settings.repo[:project.helm_settings.repo.index("/")]}",
-                            f"helm upgrade --install {project.helm_settings.name} {project.helm_settings.repo} {create_namespace} {namespace}"
+                            f"helm upgrade --install {options_file} {variables} {project.helm_settings.name} \"{project.helm_settings.repo}\" {create_namespace} {namespace}"
                         ]
                     elif project.helm_settings.mode == "upgrade" or mode == "update":
                         changeset_values[project.name] = [
                             f"helm repo update {project.helm_settings.repo[:project.helm_settings.repo.index("/")]}",
-                            f"helm upgrade {project.helm_settings.name} {project.helm_settings.repo} {create_namespace} {namespace}"
+                            f"helm upgrade {options_file} {variables} {project.helm_settings.name} \"{project.helm_settings.repo}\" {create_namespace} {namespace}"
                         ]
             case "k3s":
+                if project.kube_settings == None:
+                    continue
+
+                commands_to_run = []
+
                 data_in_bytes = bytearray(f"{project.kube_settings.yml_path}", "utf-8")
                 meta_id = hashlib.md5(data_in_bytes).digest().hex()
 
@@ -371,7 +435,7 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
                     with open(project.kube_settings.yml_path, "rb") as kube_file:
                         data = kube_file.read()
                         file_hash = hashlib.md5(data).hexdigest()
-                    
+
                     with open(f"{changeset_path}/k3hashes/{meta_id}", "w") as kube_metaid_file:
                         kube_metaid_file.write(file_hash)
                 else:
@@ -380,19 +444,20 @@ def generate_change_set(projects: list[Project]) -> dict[str, list[str]]:
                     with open(project.kube_settings.yml_path, "rb") as kube_file:
                         data = kube_file.read()
                         file_hash = hashlib.md5(data).hexdigest()
-                    
+
                     with open(f"{changeset_path}/k3hashes/{meta_id}", "r+") as kube_metaid_file:
                         read_hash = kube_metaid_file.read()
-                        
+
                         if read_hash == file_hash:
                             continue
                         else:
                             kube_metaid_file.seek(0)
                             kube_metaid_file.write(file_hash)
-                    
-                changeset_values[project.name] = [
-                    f"kubectl apply -f {project.kube_settings.yml_path}"
-                ]
+
+                            # commands_to_run.append(f"kubectl delete -f {project.kube_settings.yml_path}")
+
+                commands_to_run.append(f"kubectl apply -f {project.kube_settings.yml_path}")
+                changeset_values[project.name] = commands_to_run
             case _:
                 raise Exception("Could not match project type?")
 
@@ -403,12 +468,15 @@ def sigint_handler(signum, frame):
 
     if changeset_path == None:
         print("Changeset path is not set yet. Exiting...")
-        
+
         if signum != None:
             sys.exit(0)
 
+    if changeset_path == None:
+        exit(2)
+
     shutil.rmtree(changeset_path)
-    
+
     if signum != None:
         print("Exiting...")
         sys.exit(0)
@@ -431,11 +499,10 @@ if not projects:
 print("Generating changesets...")
 change_set = generate_change_set(projects)
 
-if not change_set:
-    print("No changes detected.")
-    exit(0)
-
 if args.dryrun_only:
+    if not change_set:
+        print("No changes detected.")
+
     sigint_handler(None, None)
 
     print("Generating changeset script (writing to stderr!)")
@@ -443,10 +510,14 @@ if args.dryrun_only:
 
     for project_name in change_set:
         print(f'echo "Applying changeset for \'{project_name}\'..."', file=sys.stderr)
-        
+
         for command in change_set[project_name]:
             print(command, file=sys.stderr)
 else:
+    if not change_set:
+        print("No changes detected.")
+        exit(0)
+
     for project_name in change_set:
         print(f"Applying changeset for '{project_name}'...")
 

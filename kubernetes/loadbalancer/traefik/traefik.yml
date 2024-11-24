@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik-deployment
+  labels:
+    app: traefik
+
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-account
+      containers:
+        - name: traefik
+          image: traefik:v3.1
+          args:
+            - "--entryPoints.web.address=:80"
+            - "--entryPoints.websecure.address=:443"
+            - "--entryPoints.websecure.http.tls.certresolver=myresolver"
+            - "--certificatesresolvers.letsencrypt.acme.email=greyson@hofers.cloud"
+            # - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+            - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+            - "--certificatesresolvers.letsencrypt.acme.storage=/sslcerts/cert.json"
+            # - "--api.insecure"
+            - "--providers.kubernetesingress"
+          ports:
+            - name: web
+              containerPort: 80
+            - name: web-tls
+              containerPort: 443
+            - name: dashboard
+              containerPort: 8080
+          env:
+            - name: CF_API_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: traefik-cf-creds
+                  key: cf-email
+            - name: CF_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: traefik-cf-creds
+                  key: cf-key
+          volumeMounts:
+            - mountPath: /ssl-certs
+              name: cert-data
+      volumes:
+        - name: cert-data
+          persistentVolumeClaim:
+            claimName: traefik-volume-claim

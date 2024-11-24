@@ -7,4 +7,7 @@ __pycache__
 out
 
 # kubernetes/
-meta
+build.log
+secrets.nix
+kubernetes/meta
+kubernetes/secrets

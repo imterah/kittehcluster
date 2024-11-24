@@ -9,7 +9,7 @@ import socket
 import json
 import sys
 
-def json_to_bytes(str: str) -> bytearray:
+def json_to_bytes(str: dict[str, bool | str]) -> bytearray:
     return bytearray(json.dumps(str), "utf-8")
 
 # Who needs Flask, anyways?
@@ -17,11 +17,11 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
     def send_headers(self):
         self.send_header("Content-Type", "application/json")
         self.end_headers()
-    
+
     def do_POST(self):
         if self.path == "/api/installer_update_webhook":
             content_length = 0
-            
+
             try:
                 content_length = int(self.headers.get('Content-Length'))
             except ValueError:
@@ -79,7 +79,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
                     output_coloring = "light_yellow"
                 elif res == "FAIL":
                     output_coloring = "light_red"
-            
+
             result_text_component = f" {resp_decoded_data["result"]} " if "result" in resp_decoded_data else " "
             final_output_text = f"{str_formatted_time} {resp_decoded_data["event_type"].upper()} {resp_decoded_data["level"]}:{result_text_component}{resp_decoded_data["name"]} ({resp_decoded_data["description"]})"
 
@@ -103,7 +103,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
                 "success": False,
                 "error": "Unknown route"
             }))
-    
+
     def do_GET(self):
         resolved_path = str(Path(self.path).resolve())
         file_path = getcwd() + resolved_path
@@ -124,7 +124,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
             }))
         except () as exception:
             exception.print_exception()
-    
+
     def log_message(self, format: str, *args):
         status_code = 0
 
@@ -136,7 +136,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
         # Disable logging for the /api/ endpoint for POST requests unless the error code > 400
         if len(args) >= 1 and args[0].startswith("POST") and self.path.startswith("/api/") and status_code < 400:
             return
-        
+
         super().log_message(format, *args)
 
 port = int(sys.argv[1]) if "SERVE_DEVELOP" not in environ else 10240

@@ -15,7 +15,7 @@ from typing import Optional
 
 latest_format_ver = 1
 
-print("KubeSync (KittehCluster, v1.0.0-test)")
+print("KubeSync (KittehCluster, v1.0.1)")
 
 parser = argparse.ArgumentParser(description="Knockoff of ansible for K3s. By default, provisions only")
 

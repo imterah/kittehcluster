@@ -1,0 +1,29 @@
+immich:
+  persistence:
+    library:
+      existingClaim: immich-pvc
+
+machine-learning:
+  persistence:
+    cache:
+      size: 25Gi
+      type: pvc
+      storageClass: nfs-client
+
+redis:
+  enabled: true
+
+postgresql:
+  enabled: true
+  primary:
+    resources:
+      limits:
+        memory: 1024Mi
+
+server:
+  ingress:
+    main:
+      enabled: true
+
+image:
+  tag: v1.121.0

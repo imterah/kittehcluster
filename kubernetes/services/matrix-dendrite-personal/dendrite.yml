@@ -1,0 +1,21 @@
+postgresql:
+  enabled: true # this installs Postgres
+  primary:
+    persistence:
+      enabled: true
+      size: 15Gi
+
+persistence:
+  storageClass: longhorn
+  jetstream:
+    storageClass: longhorn
+    capacity: 5Gi
+  media:
+    storageClass: longhorn
+    capacity: 30Gi
+  search:
+    storageClass: longhorn
+    capacity: 5Gi
+
+ingress:
+  enabled: false

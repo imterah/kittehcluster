@@ -1,0 +1,2 @@
+defaultSettings:
+  taintToleration: node-role.kubernetes.io/master=true:NoSchedule

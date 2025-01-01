@@ -1,3 +1,6 @@
+env:
+  DB_HOSTNAME: "postgres-postgresql"
+
 immich:
   persistence:
     library:
@@ -14,11 +17,7 @@ redis:
   enabled: true
 
 postgresql:
-  enabled: true
-  primary:
-    resources:
-      limits:
-        memory: 1024Mi
+  enabled: false
 
 server:
   ingress:
@@ -26,4 +25,4 @@ server:
       enabled: true
 
 image:
-  tag: v1.121.0
+  tag: v1.123.0

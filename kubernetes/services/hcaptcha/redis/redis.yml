@@ -1,0 +1,16 @@
+image:
+  repository: mcaptcha/cache
+  tag: v0.1.0
+global:
+  security:
+    allowInsecureImages: true
+master:
+  command:
+    ["redis-server", "--loadmodule", "/usr/lib/redis/modules/libcache.so"]
+  persistence:
+    enabled: true
+    storageClass: longhorn
+auth:
+  enabled: false
+replica:
+  replicaCount: 0

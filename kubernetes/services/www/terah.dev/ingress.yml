@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: www-terah-dev-ingress
+spec:
+  rules:
+    - host: terah.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: www-terah-dev
+                port:
+                  name: web

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hcaptcha-terah-dev
+  namespace: hcaptcha
+  labels:
+    app: hcaptcha-terah-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hcaptcha-terah-dev
+  template:
+    metadata:
+      labels:
+        app: hcaptcha-terah-dev
+    spec:
+      containers:
+        - name: http
+          image: mcaptcha/mcaptcha:latest
+          env:
+            - name: RUST_LOG
+              value: debug
+            - name: MCAPTCHA_allow_registration
+              value: "false"
+            - name: MCAPTCHA_server_DOMAIN
+              value: "mcaptcha.terah.dev"
+            - name: DATABASE_URL
+              value: postgres://hcaptcha:hcaptcha@postgres-postgresql:5432/hcaptcha
+            - name: MCAPTCHA_redis_URL
+              value: redis://redis-master
+            - name: PORT
+              value: "80"
+            - name: MCAPTCHA_captcha_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: hcaptcha-secrets
+                  key: captcha-salt
+            - name: MCAPTCHA__server_COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: hcaptcha-secrets
+                  key: cookie-secret
+          ports:
+            - name: web
+              containerPort: 80

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: www-terah-dev
+  labels:
+    app: www-terah-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: www-terah-dev
+  template:
+    metadata:
+      labels:
+        app: www-terah-dev
+    spec:
+      containers:
+        - name: http
+          image: ghcr.io/imterah/personal-www:v1.0.2
+          ports:
+            - name: web
+              containerPort: 80

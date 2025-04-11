@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hcaptcha-terah-dev-ingress
+  namespace: hcaptcha
+spec:
+  rules:
+    - host: mcaptcha.terah.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hcaptcha-terah-dev
+                port:
+                  name: web

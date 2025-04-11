@@ -1,0 +1,13 @@
+global:
+  postgresql:
+    auth:
+      username: hcaptcha
+      database: hcaptcha
+      password: hcaptcha
+primary:
+  persistence:
+    enabled: true
+    storageClass: longhorn
+  resources:
+    limits:
+      memory: 1024Mi
